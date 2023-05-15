@@ -1,0 +1,229 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+
+// Componente de producto
+const ProductItem = ({ item, onPress }) => {
+  return (
+    <TouchableOpacity onPress={() => onPress(item)}>
+      <View>
+        <Text>{item.name}</Text>
+        <Text>{item.description}</Text>
+        <Text>Price: {item.price}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const App = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Lógica para obtener los productos del backend o API
+    // Puedes usar fetch o axios para realizar una llamada a la API
+    // y luego actualizar el estado con los productos obtenidos.
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('API_URL/products');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleProductPress = (product) => {
+    // Lógica para mostrar los detalles del producto seleccionado
+    // Puedes navegar a una nueva pantalla o mostrar un modal, por ejemplo.
+    console.log('Product selected:', product);
+  };
+
+  return (
+    <View>
+      <Text>Minería E-commerce</Text>
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <ProductItem item={item} onPress={handleProductPress} />
+        )}
+      />
+    </View>
+  );
+};
+
+export default App;
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import * as ImagePicker from 'react-native-image-picker';
+
+// Componente de producto
+const ProductItem = ({ item, onPress }) => {
+  return (
+    <TouchableOpacity onPress={() => onPress(item)}>
+      <View>
+        <Text>{item.name}</Text>
+        <Text>{item.description}</Text>
+        <Image source={{ uri: item.image }} style={{ width: 200, height: 200 }} />
+        <Text>Price: {item.price}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const App = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Lógica para obtener los productos del backend o API
+    // ...
+
+    // Supongamos que los productos tienen una propiedad "image" que contiene la URL de la imagen
+    const fetchProducts = async () => {
+      // ...
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleProductPress = (product) => {
+    // ...
+  };
+
+  const handleImageUpload = () => {
+    ImagePicker.launchCamera({}, (response) => {
+      if (!response.didCancel && !response.error) {
+        // Aquí puedes enviar la imagen al servidor y guardar la URL en la base de datos del lote de minerales
+        console.log('Image selected:', response.uri);
+      }
+    });
+  };
+
+  return (
+    <View>
+      <Text>Minería E-commerce</Text>
+      <TouchableOpacity onPress={handleImageUpload}>
+        <Text>Subir imagen</Text>
+      </TouchableOpacity>
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <ProductItem item={item} onPress={handleProductPress} />
+        )}
+      />
+    </View>
+  );
+};
+
+export default App;
+import React, { useEffect } from 'react';
+import { View, Button } from 'react-native';
+import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+import { LoginManager, AccessToken } from 'react-native-fbsdk';
+
+const App = () => {
+  useEffect(() => {
+    // Configurar Google Sign-In
+    GoogleSignin.configure({
+      webClientId: 'YOUR_GOOGLE_WEB_CLIENT_ID',
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
+    });
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      // Aquí puedes enviar los datos del usuario al backend para el registro o inicio de sesión
+      console.log('Google User:', userInfo);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('Google login canceled');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Google login in progress');
+      } else {
+        console.log('Google login error:', error);
+      }
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      if (result.isCancelled) {
+        console.log('Facebook login canceled');
+      } else {
+        const accessToken = await AccessToken.getCurrentAccessToken();
+        if (accessToken) {
+          // Aquí puedes enviar el token de acceso al backend para el registro o inicio de sesión
+          console.log('Facebook Access Token:', accessToken);
+        }
+      }
+    } catch (error) {
+      console.log('Facebook login error:', error);
+    }
+  };
+
+  return (
+    <View>
+      <Button title="Sign in with Google" onPress={handleGoogleLogin} />
+      <Button title="Sign in with Facebook" onPress={handleFacebookLogin} />
+    </View>
+  );
+};
+
+export default App;
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+
+const App = () => {
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [rating, setRating] = useState(0);
+
+  const handleRatingPress = (user) => {
+    setSelectedUser(user);
+    setRatingModalVisible(true);
+  };
+
+  const handleRatingSubmit = () => {
+    // Aquí puedes enviar la calificación al backend y realizar las operaciones necesarias
+    console.log('Rating:', rating);
+    setRatingModalVisible(false);
+  };
+
+  const users = [
+    { id: 1, name: 'User 1' },
+    { id: 2, name: 'User 2' },
+    { id: 3, name: 'User 3' },
+  ];
+
+  return (
+    <View>
+      <Text>Minería E-commerce</Text>
+      {users.map((user) => (
+        <TouchableOpacity key={user.id} onPress={() => handleRatingPress(user)}>
+          <Text>{user.name}</Text>
+        </TouchableOpacity>
+      ))}
+      <Modal visible={ratingModalVisible}>
+        <View>
+          <Text>Calificar a {selectedUser && selectedUser.name}</Text>
+          <TextInput
+            placeholder="Puntuación"
+            keyboardType="numeric"
+            value={rating.toString()}
+            onChangeText={(text) => setRating(parseInt(text))}
+          />
+          <Button title="Enviar" onPress={handleRatingSubmit} />
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+export default App;
